@@ -17,6 +17,7 @@ const { LocalStorage } = require("node-localstorage");
 const localStorage = new LocalStorage("./scratch");
 const { v4: uuidv4 } = require("uuid");
 const mysqlPool = require("../config/mysql_database"); // Adjust the path if necessary
+const twilio = require("twilio");
 
 // const pool = require('../config/db');  // Assuming you're using MySQL pool
 const {
@@ -1230,6 +1231,27 @@ exports.updateUserStatus = catchAsyncErrors(async (req, res, next) => {
     }
     const userEmail = userData[0]?.email;
     const userName = userData[0]?.user_name;
+ const userPhone = userData[0]?.mobile;
+
+    const accountSid = process.env.TWILIO_ACCOUNT_SID;
+    const authToken = process.env.TWILIO_AUTH_TOKEN;
+    const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
+    const twilioWhatsAppNumber = process.env.TWILIO_WHATSAPP_NUMBER;
+
+  if (
+      !accountSid ||
+      !authToken ||
+      !twilioPhoneNumber ||
+      !twilioWhatsAppNumber
+    ) {
+      console.error(
+        "Twilio credentials are missing. Please check your .env file."
+      );
+      return { error: true, message: "Twilio credentials are missing" };
+    }
+    // Initialize Twilio client
+    const client = new twilio(accountSid, authToken);
+
     // Step 2: Construct the email body
     const emailMessage = `
 <html>
@@ -1271,6 +1293,54 @@ exports.updateUserStatus = catchAsyncErrors(async (req, res, next) => {
     };
 
     await sendEmail(emailOptions); // Send the email to the user's email address
+  if (userPhone) {
+      const textMessage = `Hi ${userName}, 👋
+
+      🎉 *Congratulations!* Your Unitradehub account has been activated.
+      
+      💰 *2000 Coins Credited!*  
+      You have received 2000 coins in your pending balance. Earn more by completing tasks and inviting friends!
+      
+      🚀 *Start Earning Now:*  
+      🔗 https://t.me/TheUnitadeHub_bot?startapp=1
+      
+      For support, contact us. Welcome aboard! 🚀  
+      *Team Unitradehub*`;
+
+      const whatsappMessage = `Hi ${userName}, 👋
+
+🎉 *Congratulations!* Your Unitradehub account has been successfully activated.
+
+🔐 *Your Registered Password:* ${userPassword}
+(Keep this safe and do not share it with anyone.)
+
+💰 *2000 Coins Credited!* 
+You have received 2000 coins in your pending balance. Earn more by completing tasks and inviting friends!
+
+🚀 *Start Earning Now:*  
+Tap below to log in and explore Unitradehub:  
+🔗 https://t.me/TheUnitadeHub_bot?startapp=1
+
+For any support, feel free to reach out. Welcome aboard! 🚀  
+
+*Team Unitradehub*`;
+
+      await client.messages.create({
+        from: twilioWhatsAppNumber,
+        to: `whatsapp:+91${userPhone}`, // User's phone number with country code
+        body: whatsappMessage,
+      });
+
+      console.info(`WhatsApp message sent to ${userPhone}`);
+    }
+
+    await client.messages.create({
+      from: twilioPhoneNumber,
+      to: `+91${userPhone}`,
+      body: textMessage,
+    });
+    console.info(`✅ SMS sent to ${userPhone}`);
+
     // Send a JSON response
     res.json({
       success: true,
