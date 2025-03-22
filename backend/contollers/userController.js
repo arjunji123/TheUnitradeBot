@@ -1295,7 +1295,8 @@ exports.updateUserStatus = catchAsyncErrors(async (req, res, next) => {
     await sendEmail(emailOptions); // Send the email to the user's email address
   if (userPhone) {
 
-      const textMessage = "hiiiiiii"
+const whatsappMessage = "🎉 Welcome to Unitradehub! Your account is now activated. Earn coins, refer friends & trade smartly. 🚀";
+const textMessage = "🎉 Your Unitradehub account is activated! Start earning coins now. 🚀";
 
 
 
