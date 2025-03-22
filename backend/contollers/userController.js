@@ -1297,21 +1297,7 @@ exports.updateUserStatus = catchAsyncErrors(async (req, res, next) => {
 
       const textMessage = "hiiiiiii"
 
-🎉 *Congratulations!* Your Unitradehub account has been successfully activated.
 
-🔐 *Your Registered Password:* ${userPassword}
-(Keep this safe and do not share it with anyone.)
-
-💰 *2000 Coins Credited!* 
-You have received 2000 coins in your pending balance. Earn more by completing tasks and inviting friends!
-
-🚀 *Start Earning Now:*  
-Tap below to log in and explore Unitradehub:  
-🔗 https://t.me/TheUnitadeHub_bot?startapp=1
-
-For any support, feel free to reach out. Welcome aboard! 🚀  
-
-*Team Unitradehub*`;
 
       await client.messages.create({
         from: twilioWhatsAppNumber,
