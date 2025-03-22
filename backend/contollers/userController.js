@@ -1223,7 +1223,7 @@ exports.updateUserStatus = catchAsyncErrors(async (req, res, next) => {
     await exports.distributeCoins(userId);
 
     const [userData] = await db.query(
-      "SELECT email, user_name FROM users WHERE id = ?",
+      "SELECT email, user_name, mobile FROM users WHERE id = ?",
       [userId]
     );
     if (!userData || userData.length === 0) {
@@ -1306,15 +1306,18 @@ exports.updateUserStatus = catchAsyncErrors(async (req, res, next) => {
       });
 
       console.info(`WhatsApp message sent to ${userPhone}`);
-    }
 
-    await client.messages.create({
+ await client.messages.create({
       from: twilioPhoneNumber,
       to: `+91${userPhone}`,
       body: textMessage,
     });
+    
     console.info(`✅ SMS sent to ${userPhone}`);
 
+    }
+
+   
     // Send a JSON response
     res.json({
       success: true,
