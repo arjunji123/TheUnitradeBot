@@ -1216,7 +1216,7 @@ exports.updateUserStatus = catchAsyncErrors(async (req, res, next) => {
 
   try {
     // Update user status in the database
-    await QueryModel.updateData("users", { status: newStatus }, { id: userId });
+    await QueryModel.updateData("users", { status: newStatus, pay_confirm: newStatus }, { id: userId });
     console.info(`User status updated for User ID: ${userId}`);
 
     // Distribute coins based on activation
